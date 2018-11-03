@@ -1,27 +1,76 @@
+//
+// import axios from 'axios';
+//
+// export default function ajax(url, data, type='GET') {
+//    if(type.toUpperCase() === 'GET') {
+//
+//        let querystring = ''
+//
+//        if(data) {
+//            url += '?';
+//            //将传入的对像所有可枚举的属性保存一个数组中返回
+//            //for in 能遍历出来的属性就是可枚举的属性
+//            Object.keys(data).forEach(key => {
+//                const value = data[key];
+//                url += key + '=' + value + '&'
+//            })
+//
+//            url = url.substring(0, -1);
+//            console.log(url);
+//        }
+//
+//        return axios.get(url);
+//
+//    } else {
+//        // console.log(stringify(data));
+//        return axios.post(url, data, {
+//            headers: {
+//                'Content-Type': 'application/x-www-form-urlencoded'
+//            }
+//        });
+//    }
+//
+// }
+
+
+
 /*
-能发送ajax请求的函数模块
-函数的返回值是promise对象
+ 封装axios的ajax模块
+ 返回值是promise对象
  */
-import axios from 'axios'
-const baseUrl = ''
-// const baseUrl = 'http://localhost:4000'
-export default function ajax(url, data={}, type='GET') {
-  url = baseUrl + url
-  if(type==='GET') { // 发送GET请求
-    // 拼请求参数串
-    // data: {username: tom, password: 123}
-    // paramStr: username=tom&password=123
-    let paramStr = ''
-    Object.keys(data).forEach(key => {
-      paramStr += key + '=' + data[key] + '&'
-    })
-    if(paramStr) {
-      paramStr = paramStr.substring(0, paramStr.length-1)
+
+import axios from 'axios';
+// import {stringify} from 'qs';
+
+export default function ajax(url, data, type = 'GET') {
+    let querystring = '';
+
+    if (data) {
+        //将传入的对象所有可枚举的属性保存一个数组中返回
+        // for in能遍历出来的属性就是可枚举属性
+        Object.keys(data).forEach(key => {
+            //获取属性值
+            const value = data[key];
+            querystring += key + '=' + value + '&'
+        })
+        //去掉多余&
+        //  username=111&password=222&
+        querystring = querystring.substring(0, querystring.length - 1);  //不能用-1
+        console.log(querystring);
     }
-    // 使用axios发get请求
-    return axios.get(url + '?' + paramStr)
-  } else {// 发送POST请求
-    // 使用axios发post请求
-    return axios.post(url, data)
-  }
+
+    if (type.toUpperCase() === 'GET') {
+        //用户发送的是get请求
+        //如果用户通过data传参，我要将data中的数据以查询字符串的方法拼接在url后面
+        url += '?' + querystring;
+        return axios.get(url);
+    } else {
+        //用户发送的是post请求
+        // console.log(stringify(data));
+        return axios.post(url, querystring, {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        });
+    }
 }
